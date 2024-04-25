@@ -18,9 +18,10 @@ public static class TicketsEndpoints
         // GET /tickets
         group.MapGet("/", async (TicketSystemContext dbContext) => 
             await dbContext.Tickets
-                     .Select(ticket => ticket.ToReadTicketDto())
-                     .AsNoTracking()
-                     .ToListAsync());
+                    .OrderBy(ticket=>ticket.CompletionDeadline)
+                    .Select(ticket => ticket.ToReadTicketDto())
+                    .AsNoTracking()
+                    .ToListAsync());
 
         // GET /tickets/1
         group.MapGet("/{id}", async (int id, TicketSystemContext dbContext) =>

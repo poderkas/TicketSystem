@@ -1,0 +1,97 @@
+@page "/editticket"
+@page "/editticket/{id:int}"
+@rendermode InteractiveServer
+
+@inject NavigationManager NavigationManager
+@inject TicketsClient Client
+
+<PageTitle>@description</PageTitle>
+<h3>@description</h3>
+
+@if (ticket is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm 
+                Model="@ticket" 
+                FormName="editTicket" 
+                OnValidSubmit="HandleSubmitAsync"
+                Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <InputText id="description" @bind-Value="ticket.Description" class="form-control" />
+                    <ValidationMessage For="() => ticket.Description" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="completiondeadline" class="form-label">CompletionDeadline:</label>
+                    <TicketSystem.Frontend.Datatypes.InputDateTime id="completionDeadline" class="form-control col-sm-8" @bind-Value="ticket.CompletionDeadline"></TicketSystem.Frontend.Datatypes.InputDateTime>
+                    <ValidationMessage class="offset-sm-3 col-sm-8" For="(()=>ticket.CompletionDeadline)"></ValidationMessage>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a role="button" class="btn btn-secondary" href="/">Cancel</a>
+            </EditForm>
+        </div>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public int? Id {get; set;}
+
+    public DateTime? SubmissionTime{get; set;}
+
+    [SupplyParameterFromForm]
+    private Ticket? ticket { get; set; }
+    private string description = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (ticket is not null)
+        {
+            return;
+        }
+
+        if (Id is not null)
+        {
+            ticket = await Client.GetTicketAsync(Id.Value);
+            description = $"Edit {ticket.Description}";
+        }
+        else
+        {
+            ticket = new()
+            {
+                Description = string.Empty,
+                SubmissionTime = DateTime.UtcNow
+            };
+            
+            description = "New Ticket";
+        }
+    }
+
+    private async Task HandleSubmitAsync()
+    {
+        ArgumentNullException.ThrowIfNull(ticket);
+
+        if (Id is null)
+        {
+            await Client.AddTicketAsync(ticket);
+        }
+        else
+        {
+            ticket.Id = Id.Value;
+            await Client.UpdateTicketAsync(ticket);
+        }
+        
+        NavigationManager.NavigateTo("/");
+    }
+}

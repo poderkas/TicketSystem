@@ -1,9 +1,20 @@
+using TicketSystem.Frontend.Clients;
 using TicketSystem.Frontend.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorComponents();
+builder.Services.AddRazorComponents()
+                .AddInteractiveServerComponents();
+
+var ticketSystemApiUrl = builder.Configuration["TicketSystemApiUrl"] ?? 
+    throw new Exception("TicketSystemApiUrl is not set");
+
+builder.Services.AddHttpClient<TicketsClient>(
+    client => client.BaseAddress = new Uri(ticketSystemApiUrl));
+
+builder.Services.AddHttpClient<TicketsClient>(
+    client => client.BaseAddress = new Uri(ticketSystemApiUrl));    
 
 var app = builder.Build();
 
@@ -15,11 +26,10 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 app.UseAntiforgery();
 
-app.MapRazorComponents<App>();
+app.MapRazorComponents<App>()
+   .AddInteractiveServerRenderMode();
 
 app.Run();
