@@ -16,7 +16,7 @@
                 <button type="button" 
                         class="btn btn-primary" 
                         data-bs-dismiss="modal"
-                        @onclick="@ConfirmAsync">Delete</button>
+                        @onclick="@ConfirmAsync">Complete</button>
             </div>
         </div>
     </div>
@@ -30,7 +30,7 @@
 
     protected override void OnParametersSet()
     {
-        title = $"Delete {ticket?.Description}?";
+        title = $"Mark completed {ticket?.Description}?";
     }
 
     public static string GetModalId(Ticket? ticket)

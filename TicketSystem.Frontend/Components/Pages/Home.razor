@@ -28,7 +28,7 @@ else
         </thead>
         <tbody>
             @foreach (var ticket in tickets){
-                <tr>
+                <tr class="@(ticket.CompletionDeadline.Subtract(DateTime.Now).TotalSeconds<3600 ? "table-danger" : "table-primary")">
                     <td>@ticket.Id</td>
                     <td>@ticket.Description</td>
                     <td>@ticket.SubmissionTime</td>
@@ -38,10 +38,10 @@ else
                             <a class="btn btn-primary me-2" role="button" href="@TicketUrl(ticket.Id)">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <button class="btn btn-danger" 
+                            <button class="btn btn-success" 
                                     data-bs-toggle="modal" 
                                     data-bs-target="@GetDeleteModalId(ticket)">
-                                <i class="bi bi-x-lg"></i>
+                                <i class="bi bi-check-square"></i>
                             </button>
                         </div>
                         <DeleteTicket Ticket="@ticket" />
