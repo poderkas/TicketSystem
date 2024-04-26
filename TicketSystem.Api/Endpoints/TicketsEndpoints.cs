@@ -18,7 +18,7 @@ public static class TicketsEndpoints
         // GET /tickets
         group.MapGet("/", async (TicketSystemContext dbContext) => 
             await dbContext.Tickets
-                    .OrderBy(ticket=>ticket.CompletionDeadline)
+                    .OrderByDescending(ticket=>ticket.CompletionDeadline)
                     .Select(ticket => ticket.ToReadTicketDto())
                     .AsNoTracking()
                     .ToListAsync());
